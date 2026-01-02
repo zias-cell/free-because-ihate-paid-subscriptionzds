@@ -1,160 +1,170 @@
 # Contributing Guide
 
 - [How to?](#how-to)
-- [Stream Description Scheme](#stream-description-scheme)
+- [Data Scheme](#data-scheme)
 - [Project Structure](#project-structure)
 - [Scripts](#scripts)
 - [Workflows](#workflows)
 
 ## How to?
 
-### How to add a new stream link to a playlists?
+### How to add a new entry to the database?
 
-You have several options:
+The easiest way is to submit a request using one of the available [forms](https://github.com/iptv-org/database/issues/new/choose). Simply enter all the information you know and click "Submit". Once your request is approved, the entry will be automatically added to the database.
 
-1. Create a new request using this [form](https://github.com/iptv-org/iptv/issues/new?assignees=&labels=streams:add&projects=&template=1_streams_add.yml&title=Add%3A+) and if approved, the link will automatically be added to the playlist on the next update.
+If you want to add more than one entry, you can do so directly by editing the file in the [data/](data/) folder using any text editor. After that, just [commit](https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/about-commits) all changes and send us a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).
 
-2. Add the link to the playlist directly using a [pull request](https://github.com/iptv-org/iptv/pulls).
+**IMPORTANT:** Before sending the request, make sure that the number of columns in the file has not changed and that all rows end with [CRLF](https://developer.mozilla.org/en-US/docs/Glossary/CRLF). Otherwise we will not be able to review this request.
 
-Regardless of which option you choose, before posting your request please do the following:
+### How to edit a database entry?
 
-- Make sure the link you want to add works stably. To check this, open it in one of the players (for example, [VLC player](https://www.videolan.org/vlc/index.html)) and watch the broadcast for at least a minute (some test streams are interrupted after 15-30 seconds).
-- Make sure the link is not already in the playlist. This can be done by [searching](https://github.com/search?q=repo%3Aiptv-org%2Fiptv+http%3A%2F%2Fexample.com&type=code) the repository.
-- Make sure the link does not lead to the Xtream Codes server. [Why don't you accept links to Xtream Codes server?](FAQ.md#why-dont-you-accept-links-to-xtream-codes-server)
-- Make sure that the link leads directly to the broadcast, without unnecessary redirects.
-- Find the ID of the channel you want on [iptv-org.github.io](https://iptv-org.github.io/). If your desired channel is not on the list you can leave a request to add it [here](https://github.com/iptv-org/database/issues/new/choose).
-- Make sure the channel is not blocklisted. It can also be done through [iptv-org.github.io](https://iptv-org.github.io/).
-- If you know that the broadcast only works in certain countries or it is periodically interrupted, do not forget to indicate this in the request.
+The first option is to send a request through one of the available [forms](https://github.com/iptv-org/database/issues/new/choose). Simply enter the new data in the form and click "Submit". To delete a value, insert `~` in the desired field. Once your request has been approved, the entry will be automatically updated.
 
-A requests without a valid stream ID or working link to the stream will be closed immediately.
+The second option is to edit the file in the [data/](data/) folder using any text editor and then send us a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).
 
-Note all links in playlists are sorted automatically by scripts so there is no need to sort them manually. For more info, see [Scripts](#scripts).
+**IMPORTANT:** Before sending the request, make sure that the number of columns in the file has not changed and that all rows end with [CRLF](https://developer.mozilla.org/en-US/docs/Glossary/CRLF). Otherwise we will not be able to review this request.
 
-### How to fix the stream description?
+### How to delete an entry from the database?
 
-Most of the stream description (channel name, feed name, categories, languages, broadcast area, logo) we load from the [iptv-org/database](https://github.com/iptv-org/database) using the stream ID.
+To do this, you need to fill out one of the [forms](https://github.com/iptv-org/database/issues/new/choose), and once your request has been approved, the entry will be automatically deleted.
 
-So first of all, make sure that the desired stream has the correct ID. A full list of all supported channels and their corresponding IDs can be found on [iptv-org.github.io](https://iptv-org.github.io/). To change the stream ID of any link in the playlist, just fill out this [form](https://github.com/iptv-org/iptv/issues/new?assignees=&labels=streams%3Aedit&projects=&template=2_streams_edit.yml&title=Edit%3A+).
+## Data Scheme
 
-If, however, you have found an error in the database itself, this is the place to go: [How to edit channel description?](https://github.com/iptv-org/database/blob/master/CONTRIBUTING.md#how-to-edit-channel-description)
+### channels
 
-### How to distinguish a link to an Xtream Codes server from a regular one?
+| Field       | Description                                                                                                                                                                         | Required | Example                    |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------- |
+| id          | Unique channel ID derived from the `name` and `country` separated by dot. May only contain Latin letters, numbers and dot.                                                          | Required | `AnhuiTV.cn`               |
+| name        | Official channel name in English or call sign. May include: `a-z`, `0-9`, `space`, `-`, `!`, `:`, `&`, `.`, `+`, `'`, `/`, `»`, `#`, `%`, `°`, `$`, `@`, `?`, <code>\|</code>, `¡`. | Required | `Anhui TV`                 |
+| alt_names   | List of alternative channel names separated by `;`. May contain any characters except `,` and `"`.                                                                                  | Optional | `安徽卫视;AHTV`            |
+| network     | Network of which this channel is a part. May contain any characters except `,` and `"`.                                                                                             | Optional | `Anhui`                    |
+| owners      | List of channel owners separated by `;`. May contain any characters except `,` and `"`.                                                                                             | Optional | `China Central Television` |
+| country     | Country code from which the channel is transmitted. A list of all supported countries and their codes can be found in [data/countries.csv](data/countries.csv)                      | Required | `CN`                       |
+| categories  | List of categories to which this channel belongs separated by `;`. A list of all supported categories can be found in [data/categories.csv](data/categories.csv).                   | Optional | `animation;kids`           |
+| is_nsfw     | Indicates whether the channel broadcasts adult content (`TRUE` or `FALSE`).                                                                                                         | Required | `FALSE`                    |
+| launched    | Launch date of the channel (`YYYY-MM-DD`).                                                                                                                                          | Optional | `2016-07-28`               |
+| closed      | Date on which the channel closed (`YYYY-MM-DD`).                                                                                                                                    | Optional | `2020-05-31`               |
+| replaced_by | The ID of the channel that this channel was replaced by.                                                                                                                            | Optional | `CCTV1.cn`                 |
+| website     | Official website URL.                                                                                                                                                               | Optional | `http://www.ahtv.cn/`      |
 
-Most of them have this form:
+### feeds
 
-`http(s)://{hostname}:{port}/{username}/{password}/{channelID}` (port is often `25461`)
+| Field          | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Required | Example                      |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------- |
+| channel        | ID of the channel to which this feed belongs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Required | `France3.fr`                 |
+| id             | Unique feed ID derived from the `name`. May only contain Latin letters and numbers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Required | `Mediterranee`               |
+| name           | Name of the feed in English. May include: `a-z`, `0-9`, `space`, `-`, `!`, `:`, `&`, `.`, `+`, `'`, `/`, `»`, `#`, `%`, `°`, `$`, `@`, `?`, <code>\|</code>, `¡`.                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Required | `Mediterranee`               |
+| alt_names      | List of alternative feed names separated by `;`. May contain any characters except `,` and `"`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Optional | `Méditerranée;Mediterranean` |
+| is_main        | Indicates if this feed is the main for the channel (`TRUE` or `FALSE`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Required | `FALSE`                      |
+| broadcast_area | List of codes describing the broadcasting area of the feed separated by `;`. Any combination of `r/<region_code>`, `c/<country_code>`, `s/<subdivision_code>`, `ct/<city_code>` is allowed. A full list of supported codes can be found here: [data/regions.csv](https://github.com/iptv-org/database/blob/master/data/regions.csv), [data/countries.csv](https://github.com/iptv-org/database/blob/master/data/countries.csv), [data/subdivisions.csv](https://github.com/iptv-org/database/blob/master/data/subdivisions.csv), [data/cities.csv](https://github.com/iptv-org/database/blob/master/data/cities.csv). | Required | `s/FR-IDF;s/FR-NOR`          |
+| timezones      | List of timezones in which the feed is broadcast separated by `;`. A list of all supported timezones and their codes can be found in [data/timezones.csv](data/timezones.csv).                                                                                                                                                                                                                                                                                                                                                                                                                                        | Required | `Europe/Paris`               |
+| languages      | List of languages in which the feed is broadcast separated by `;`. A list of all supported languages and their codes can be found in [data/languages.csv](data/languages.csv).                                                                                                                                                                                                                                                                                                                                                                                                                                        | Required | `fra;eng`                    |
+| format         | Video format of the feed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Required | `1080i`                      |
 
-To make sure that the link leads to the Xtream Codes server, copy the `hostname`, `port`, `username` and `password` into the link below and try to open it in a browser:
+### logos
 
-`http(s)://{hostname}:{port}/panel_api.php?username={username}&password={password}`
+| Field   | Description                                                                                                                                                                                                                         | Required | Example                        |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------ |
+| channel | Channel ID.                                                                                                                                                                                                                         | Required | `France3.fr`                   |
+| feed    | Feed ID.                                                                                                                                                                                                                            | Optional | `Alpes`                        |
+| tags    | List of keywords describing this version of the logo separated by `;`. May include: `a-z`, `0-9` and `-`.                                                                                                                           | Optional | `horizontal;white`             |
+| width   | The width of the image in pixels.                                                                                                                                                                                                   | Required | `1000`                         |
+| height  | The height of the image in pixels.                                                                                                                                                                                                  | Required | `468`                          |
+| format  | Image format. One of: `PNG`, `JPEG`, `SVG`, `GIF`, `WebP`, `AVIF`, `APNG`.                                                                                                                                                          | Optional | `SVG`                          |
+| url     | Logo URL. Only URLs with [HTTPS](https://ru.wikipedia.org/wiki/HTTPS) protocol are supported. Also the link should not be [geo-blocked](https://en.wikipedia.org/wiki/Geo-blocking). May contain any characters except `,` and `"`. | Required | `https://example.com/logo.svg` |
 
-If the link answers, you're with an Xtream Codes server.
+### categories
 
-### How to report a broken stream?
+| Field       | Description                       | Required | Example                      |
+| ----------- | --------------------------------- | -------- | ---------------------------- |
+| id          | Category ID                       | Required | `news`                       |
+| name        | Category name                     | Required | `News`                       |
+| description | Short description of the category | Required | `Programming is mostly news` |
 
-Fill out this [form](https://github.com/iptv-org/iptv/issues/new?assignees=&labels=streams:remove&projects=&template=3_streams_report.yml&title=Broken%3A+) and as soon as a working replacement appears, we will add it to the playlist or at least remove the non-working one.
+### languages
 
-The only thing before publishing your report is to make sure that:
+| Field | Description                                                               | Required | Example    |
+| ----- | ------------------------------------------------------------------------- | -------- | ---------- |
+| name  | Official language name                                                    | Required | `Croatian` |
+| code  | [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3) code of the language | Required | `hrv`      |
 
-- The link is still in our playlists. You can verify this by [searching](https://github.com/search?q=repo%3Aiptv-org%2Fiptv+http%3A%2F%2Fexample.com&type=code) the repository.
-- The link really doesn't work and is not just [geo-blocked](https://en.wikipedia.org/wiki/Geo-blocking). To check this, you can either use a [VPN](https://en.wikipedia.org/wiki/Virtual_private_network) or services such as [streamtest.in](https://streamtest.in/).
+### countries
 
-An issue without a valid link will be closed immediately.
+| Field     | Description                                                                                                                                             | Required | Example   |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | --------- |
+| name      | Official name of the country                                                                                                                            | Required | `Canada`  |
+| code      | [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) code of the country                                                              | Required | `CA`      |
+| languages | List of official languages of the country separated by `;`. A list of all supported languages can be found in [data/languages.csv](data/languages.csv). | Required | `eng;fra` |
+| flag      | Country flag emoji                                                                                                                                      | Required | `🇨🇦`      |
 
-### How to find a broken stream?
+### subdivisions
 
-For starters, you can just try to open the playlist in [VLC player](https://www.videolan.org/vlc/). The player outputs all errors to the log (Tools -> Messages) so you'll be able to determine pretty accurately why a link isn't working.
+| Field   | Description                                                                                | Required | Example     |
+| ------- | ------------------------------------------------------------------------------------------ | -------- | ----------- |
+| country | [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) code of the country | Required | `BD`        |
+| name    | Official subdivision name                                                                  | Required | `Bandarban` |
+| code    | [ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2) code of the subdivision             | Required | `BD-01`     |
+| parent  | [ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2) code of the parent subdivision      | Optional | `BD-B`      |
 
-Another way to test links is to use the NPM script. To do this, first make sure you have [Node.js](https://nodejs.org/en) installed on your system. Then go to the `iptv` folder using [Console](https://en.wikipedia.org/wiki/Windows_Console) (or [Terminal](<https://en.wikipedia.org/wiki/Terminal_(macOS)>) if you have macOS) and run the command:
+### cities
 
-```sh
-npm run playlist:test path/to/playlist.m3u
-```
+| Field       | Description                                                                                                          | Required | Example   |
+| ----------- | -------------------------------------------------------------------------------------------------------------------- | -------- | --------- |
+| country     | [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) code of the country where the city is located | Required | `CN`      |
+| subdivision | [ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2) code of the subdivision where the city is located             | Optional | `CN-SD`   |
+| name        | Official city name                                                                                                   | Required | `Yantai`  |
+| code        | [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE) of the city                                                     | Required | `CNYAT`   |
+| wikidata_id | ID of this city in [Wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page)                                      | Required | `Q210493` |
 
-This command will run an automatic check of all links in the playlist and display their status:
+### regions
 
-```sh
-npm run playlist:test streams/fr.m3u
+| Field     | Description                                                                                                            | Required | Example          |
+| --------- | ---------------------------------------------------------------------------------------------------------------------- | -------- | ---------------- |
+| name      | Official name of the region                                                                                            | Required | `Central Asia`   |
+| code      | Abbreviated designation for the region. May only contain Latin letters in upper case. The minimum length is 3 letters. | Required | `CAS`            |
+| countries | List of country codes in the region                                                                                    | Required | `KG;KZ;TJ;TM;UZ` |
 
-streams/fr.m3u
-┌─────┬───────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────────────────┬────────────────┬───────────────────────────┐
-│     │ tvg-id                    │ url                                                                                                  │ label          │ status                    │
-├─────┼───────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────┼────────────────┼───────────────────────────┤
-│  0  │ 6ter.fr                   │ https://origin-caf900c010ea8046.live.6cloud.fr/out/v1/29c7a579af3348b48230f76cd75699a5/dash_short... │                │ LOADING...                │
-│  1  │ 20MinutesTV.fr            │ https://lives.digiteka.com/stream/86d3e867-a272-496b-8412-f59aa0104771/index.m3u8                    │                │ FFMPEG_STREAMS_NOT_FOUND  │
-│  2  │                           │ https://video1.getstreamhosting.com:1936/8420/8420/playlist.m3u8                                     │                │ OK                        │
-│  3  │ ADNTVPlus.fr              │ https://samsunguk-adn-samsung-fre-qfrlc.amagi.tv/playlist/samsunguk-adn-samsung-fre/playlist.m3u8    │ Geo-blocked    │ HTTP_FORBIDDEN            │
-│  4  │ Africa24.fr               │ https://edge12.vedge.infomaniak.com/livecast/ik:africa24/manifest.m3u8                               │                │ OK                        │
-│  5  │ Africa24English.fr        │ https://edge17.vedge.infomaniak.com/livecast/ik:africa24sport/manifest.m3u8                          │                │ OK                        │
-│  6  │ AfricanewsEnglish.fr      │ https://37c774660687468c821a51190046facf.mediatailor.us-east-1.amazonaws.com/v1/master/04fd913bb2... │                │ HTTP_GATEWAY_TIMEOUT      │
-│  7  │ AlpedHuezTV.fr            │ https://edge.vedge.infomaniak.com/livecast/ik:adhtv/chunklist.m3u8                                   │ Not 24/7       │ HTTP_NOT_FOUND            │
-```
+### timezones
 
-Also, if you add the `--fix` option to the command, the script will automatically remove all broken streams it finds from your local copy of playlists:
+| Field      | Description                                                               | Required | Example               |
+| ---------- | ------------------------------------------------------------------------- | -------- | --------------------- |
+| id         | Timezone ID from [tz database](https://en.wikipedia.org/wiki/Tz_database) | Required | `Africa/Johannesburg` |
+| utc_offset | [UTC offset](https://en.wikipedia.org/wiki/UTC_offset) for this time zone | Required | `+02:00`              |
+| countries  | List of countries included in this time zone                              | Required | `ZA;LS;SZ`            |
 
-```sh
-npm run playlist:test streams/fr.m3u --- --fix
-```
+### blocklist
 
-After that, all you need to do is report the broken streams you found via the [form](https://github.com/iptv-org/iptv/issues/new?assignees=&labels=streams:remove&projects=&template=3_streams_report.yml&title=Broken%3A+) or create a [pull request](https://github.com/iptv-org/iptv/pulls) with updated playlists.
+List of channels blocked at the request of copyright holders.
 
-### How to remove my channel from playlist?
-
-To request removal of a link to a channel from the repository, you need to fill out this [form](https://github.com/iptv-org/iptv/issues/new?assignees=&labels=removal+request&projects=&template=6_copyright-claim.yml&title=Remove%3A+) and wait for the request to be reviewed (this usually takes no more than 1 business day). And if the request is approved, links to the channel will be immediately removed from the repository.
-
-The channel will also be added to our [blocklist](https://github.com/iptv-org/database/blob/master/data/blocklist.csv) to avoid its appearance in our playlists in the future.
-
-Please note that we only accept removal requests from channel owners and their official representatives, all other requests will be closed immediately.
-
-## Stream Description Scheme
-
-For a stream to be approved, its description must follow this template:
-
-```
-#EXTINF:-1 tvg-id="STREAM_ID",STREAM_TITLE (QUALITY) [LABEL]
-STREAM_URL
-```
-
-| Attribute      | Description                                                                                                                                                                | Required | Valid values                                 |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------- |
-| `STREAM_ID`    | Stream ID consisting of channel ID and feed ID. Full list of supported channels with corresponding ID could be found on [iptv-org.github.io](https://iptv-org.github.io/). | Optional | `<channel_id>` or `<channel_id>@<feed_id>`   |
-| `STREAM_TITLE` | Stream title consisting of channel name and feed name. May contain any characters except: `,`, `[`, `]`.                                                                   | Required | -                                            |
-| `QUALITY`      | Maximum stream quality.                                                                                                                                                    | Optional | `2160p`, `1080p`, `720p`, `480p`, `360p` etc |
-| `LABEL`        | Specified in cases where the broadcast for some reason may not be available to some users.                                                                                 | Optional | `Geo-blocked` or `Not 24/7`                  |
-| `STREAM_URL`   | Stream URL.                                                                                                                                                                | Required | -                                            |
-
-Example:
-
-```xml
-#EXTINF:-1 tvg-id="ExampleTV.us@East",Example TV East (720p) [Not 24/7]
-https://example.com/playlist.m3u8
-```
-
-Also, if necessary, you can specify custom [HTTP User-Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent) and [HTTP Referrer](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer) through `#EXTVLCOPT` directive:
-
-```xml
-#EXTINF:-1 tvg-id="ExampleTV.us",Example TV
-#EXTVLCOPT:http-referrer=http://example.com/
-#EXTVLCOPT:http-user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)
-http://example.com/stream.m3u8
-```
+| Field   | Description                                     | Required | Example                           |
+| ------- | ----------------------------------------------- | -------- | --------------------------------- |
+| channel | Channel ID                                      | Required | `AnimalPlanetAfrica.us`           |
+| reason  | Reason for blocking                             | Required | `dmca`                            |
+| ref     | Link to removal request or DMCA takedown notice | Required | `https://example.com/issues/0000` |
 
 ## Project Structure
 
-- `.github/`
-  - `ISSUE_TEMPLATE/`: issue templates for the repository.
-  - `workflows`: contains [GitHub actions](https://docs.github.com/en/actions/quickstart) workflows.
-  - `CODE_OF_CONDUCT.md`: rules you shouldn't break if you don't want to get banned.
-- `.readme/`
-  - `config.json`: config for the `markdown-include` package, which is used to compile everything into one `PLAYLISTS.md` file.
-  - `preview.png`: image displayed in the `README.md`.
-  - `template.md`: template for `PLAYLISTS.md`.
-- `scripts/`: contains all scripts used in the repository.
-- `streams/`: contains all streams broken down by the country from which they are broadcast.
-- `tests/`: contains tests to check the scripts.
-- `CONTRIBUTING.md`: file you are currently reading.
-- `PLAYLISTS.md`: auto-updated list of available playlists.
-- `README.md`: project description.
+```
+database/
+├── .github/
+|   ├── ISSUE_TEMPLATE      # issue templates for the repository
+|   ├── workflows           # contains GitHub actions workflows
+|   ├── CODE_OF_CONDUCT.md  # rules you shouldn't break if you don't want to get banned
+├── .husky/
+|   ├── pre-commit          # commands to run before each commit
+├── .readme/
+|   ├── preview.png         # image displayed in the README.md
+├── data/                   # contains all data
+├── scripts/                # contains all scripts used in the repository
+├── tests/                  # contains tests to check the scripts
+├── .prettierrc.js          # configuration file for Prettier
+├── eslint.config.mjs       # configuration file for ESLint
+├── package.json            # project manifest file
+├── tsconfig.json           # configuration file for TypeScript
+├── LICENSE                 # license text
+├── CONTRIBUTING.md         # file you are currently reading
+├── README.md               # project description displayed on the home page
+```
 
 ## Scripts
 
@@ -164,20 +174,12 @@ For scripts to work, you must have [Node.js](https://nodejs.org/en) installed on
 
 To run scripts use the `npm run <script-name>` command.
 
-- `act:check`: allows to run the [check](https://github.com/iptv-org/iptv/blob/master/.github/workflows/check.yml) workflow locally. Depends on [nektos/gh-act](https://github.com/nektos/gh-act).
-- `act:format`: allows to test the [format](https://github.com/iptv-org/iptv/blob/master/.github/workflows/update.yml) workflow locally. Depends on [nektos/gh-act](https://github.com/nektos/gh-act).
-- `act:update`: allows to test the [update](https://github.com/iptv-org/iptv/blob/master/.github/workflows/update.yml) workflow locally. Depends on [nektos/gh-act](https://github.com/nektos/gh-act).
-- `api:load`: downloads the latest channel and stream data from the [iptv-org/api](https://github.com/iptv-org/api).
-- `playlist:format`: formats internal playlists. The process includes [URL normalization](https://en.wikipedia.org/wiki/URI_normalization), duplicate removal, removing invalid id's and sorting links by channel name, quality, and label.
-- `playlist:update`: triggers an update of internal playlists. The process involves processing approved requests from issues.
-- `playlist:generate`: generates all public playlists.
-- `playlist:validate`: сhecks ids and links in internal playlists for errors.
-- `playlist:lint`: сhecks internal playlists for syntax errors.
-- `playlist:test`: tests links in internal playlists.
-- `playlist:edit`: utility for quick streams mapping.
-- `playlist:export`: creates a JSON file with all streams for the [iptv-org/api](https://github.com/iptv-org/api) repository.
-- `readme:update`: updates the list of playlists in [README.md](README.md).
-- `report:create`: creates a report on current issues.
+- `act:check`: allows to run the [check](https://github.com/iptv-org/iptv/blob/master/.github/workflows/check.yml) workflow locally. Depends on [nektos/act](https://github.com/nektos/act).
+- `act:update`: allows to run the [update](https://github.com/iptv-org/iptv/blob/master/.github/workflows/update.yml) workflow locally. Depends on [nektos/act](https://github.com/nektos/act).
+- `act:deploy`: allows to run the [deploy](https://github.com/iptv-org/iptv/blob/master/.github/workflows/deploy.yml) workflow locally. Depends on [nektos/act](https://github.com/nektos/act).
+- `db:validate`: checks the integrity of data.
+- `db:export`: saves all data in JSON format to the `/.api` folder.
+- `db:update`: triggers a data update using approved requests from issues.
 - `lint`: сhecks the scripts for syntax errors.
 - `test`: runs a test of all the scripts described above.
 
@@ -187,6 +189,6 @@ To automate the run of the scripts described above, we use the [GitHub Actions w
 
 Each workflow includes its own set of scripts that can be run either manually or in response to an event.
 
-- `check`: sequentially runs the `api:load`, `playlist:check` and `playlist:validate` scripts when a new pull request appears, and blocks the merge if it detects an error in it.
-- `format`: sequentially runs `api:load`, `playlist:format`, `playlist:lint` and `playlist:validate` scripts.
-- `update`: every day at 0:00 UTC sequentially runs `api:load`, `playlist:update`, `playlist:lint`, `playlist:validate`, `playlist:generate`, `playlist:export` and `readme:update` scripts and deploys the output files if successful.
+- `check`: runs the `db:validate` script when a new pull request appears, and blocks the merge if it detects an error in it.
+- `update`: sequentially runs `db:update` and `db:validate` scripts and commits all the changes if successful.
+- `deploy`: after each update of the [master](https://github.com/iptv-org/database/branches) branch runs the script `db:export` and then publishes the resulting files to the [iptv-org/api](https://github.com/iptv-org/api) repository.

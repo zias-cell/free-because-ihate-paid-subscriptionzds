@@ -1,11 +1,11 @@
 import typescriptEslint from '@typescript-eslint/eslint-plugin'
 import stylistic from '@stylistic/eslint-plugin'
-import tsParser from '@typescript-eslint/parser'
-import { FlatCompat } from '@eslint/eslintrc'
-import { fileURLToPath } from 'node:url'
 import globals from 'globals'
+import tsParser from '@typescript-eslint/parser'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import js from '@eslint/js'
+import { FlatCompat } from '@eslint/eslintrc'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -16,7 +16,7 @@ const compat = new FlatCompat({
 })
 
 export default [
-  ...compat.extends('eslint:recommended', 'plugin:@typescript-eslint/recommended'),
+  ...compat.extends('eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'),
   {
     plugins: {
       '@typescript-eslint': typescriptEslint,
@@ -25,7 +25,8 @@ export default [
 
     languageOptions: {
       globals: {
-        ...globals.browser
+        ...globals.node,
+        ...globals.jest
       },
 
       parser: tsParser,
@@ -34,23 +35,20 @@ export default [
     },
 
     rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-var-requires': 'off',
       'no-case-declarations': 'off',
+      '@stylistic/linebreak-style': ['error', 'windows'],
 
-      indent: [
+      quotes: [
         'error',
-        2,
+        'single',
         {
-          SwitchCase: 1
+          avoidEscape: true
         }
       ],
 
-      '@stylistic/linebreak-style': ['error', 'windows'],
-      quotes: ['error', 'single'],
       semi: ['error', 'never']
     }
-  },
-
-  {
-    ignores: ['tests/__data__/**']
   }
 ]

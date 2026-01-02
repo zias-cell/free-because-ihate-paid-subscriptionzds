@@ -1,9 +1,4 @@
-node_modules
-.artifacts
-.secrets
-.actrc
+/node_modules/
+/.artifacts/
 .DS_Store
-/.gh-pages/
-/.api/
-.env
 /temp/
